@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoArchive™</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<script src="https://kit.fontawesome.com/6dbcb3829c.js" crossorigin="anonymous"></script>
+<link rel="shortcut icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Glacial+Indifference&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=PT+Sans+Narrow:wght@700&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Glacial Indifference', sans-serif;
+    overflow: hidden;
+    color: #ffffff;
+    background: url('bg.png') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Canvas for floating Robux logos */
+#logo-canvas {
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:1;
+}
+
+/* Content wrapper */
+#hero .content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Title */
+#center h1 {
+    font-family: 'PT Sans Narrow', sans-serif;
+    margin-bottom: 20px;
+    font-size: 3rem;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 0 0 5px #ffffff, 0 0 10px #cccccc;
+    animation: floatTitle 5s ease-in-out infinite;
+}
+
+@keyframes floatTitle {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Welcome text */
+#welcome-text {
+    font-size: 1.3rem;
+    margin-top: 15px;
+    line-height: 1.6;
+    text-shadow: 0 0 3px #ffffff, 0 0 6px #cccccc;
+    max-width: 700px;
+    transition: all 0.3s ease;
+}
+
+/* Social icons */
+.icons a {
+    font-size: 2rem;
+    margin: 0 12px;
+    transition: transform 0.3s, filter 0.3s, opacity 0.3s;
+}
+
+/* Official brand colors */
+.icons .roblox { color: #FF0000; }
+.icons .instagram { color: #E1306C; }
+.icons .discord { color: #5865F2; }
+
+.icons a:hover {
+    transform: scale(1.4) rotate(-5deg);
+    filter: brightness(1.3);
+}
+
+/* Mute button */
+.mute-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 1.5rem;
+    color: #ffffff;
+    cursor: pointer;
+    text-shadow: 0 0 5px #ffffff;
+    transition: transform 0.3s, text-shadow 0.3s;
+}
+
+.mute-button:hover {
+    transform: scale(1.2);
+    text-shadow: 0 0 10px #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px){
+    #center h1 { font-size: 2rem; }
+    #welcome-text { font-size: 1rem; padding: 0 15px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="logo-canvas"></canvas>
+
+<div id="hero">
+    <div class="content">
+        <div id="center">
+            <h1>RoArchive™ | Bangladesh</h1>
+            <div id="welcome-text">
+                Welcome to RoArchive™ — Cheap Robux in Bangladesh!<br>
+                We offer affordable Robux, fast delivery, and secure group payouts.<br>
+                Your satisfaction and safety are our top priorities.
+            </div>
+            <div class="icons">
+                <a class="roblox" href="https://www.roblox.com/"><i class="fab fa-roblox"></i></a>
+                <a class="instagram" href="https://instagram.com/roarchive.bd"><i class="fab fa-instagram"></i></a>
+                <a class="discord" href="https://discord.gg/robuxbd"><i class="fab fa-discord"></i></a>
+            </div>
+        </div>
+
+        <div class="mute-button" id="mute-btn">
+            <i class="fas fa-volume-mute" id="mute-icon"></i>
+        </div>
+
+        <audio id="myaudio" autoplay loop muted>
+            <source src="music.mp3" type="audio/mp3">
+        </audio>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+// Mute/unmute functionality
+$(document).ready(function(){
+    const audio = document.getElementById("myaudio");
+    const muteBtn = document.getElementById("mute-btn");
+    const muteIcon = document.getElementById("mute-icon");
+
+    audio.volume = 0.5; // default volume
+
+    muteBtn.addEventListener("click", () => {
+        if(audio.muted){
+            audio.muted = false;
+            audio.play(); // ensure play on mobile browsers
+            muteIcon.classList.replace("fa-volume-mute", "fa-volume-up");
+        } else {
+            audio.muted = true;
+            muteIcon.classList.replace("fa-volume-up", "fa-volume-mute");
+        }
+    });
+});
+
+// Floating Robux logo background
+const canvas = document.getElementById('logo-canvas');
+const ctx = canvas.getContext('2d');
+let logos = [];
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+window.addEventListener('resize', function(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initLogos();
+});
+
+// Robux logo image
+const robuxLogo = new Image();
+robuxLogo.src = "robux.png"; // Make sure robux.png is in the same folder
+
+class Logo {
+    constructor(){
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 30 + 20;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+        this.opacity = Math.random() * 0.6 + 0.3;
+    }
+    update(){
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if(this.x > canvas.width) this.x = 0;
+        if(this.x < 0) this.x = canvas.width;
+        if(this.y > canvas.height) this.y = 0;
+        if(this.y < 0) this.y = canvas.height;
+    }
+    draw(){
+        ctx.globalAlpha = this.opacity;
+        ctx.drawImage(robuxLogo, this.x, this.y, this.size, this.size);
+        ctx.globalAlpha = 1;
+    }
+}
+
+function initLogos(){
+    logos = [];
+    for(let i=0; i<30; i++){
+        logos.push(new Logo());
+    }
+}
+
+function animateLogos(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    logos.forEach(l => {
+        l.update();
+        l.draw();
+    });
+    requestAnimationFrame(animateLogos);
+}
+
+robuxLogo.onload = () => {
+    initLogos();
+    animateLogos();
+};
+</script>
+</body>
+</html>
